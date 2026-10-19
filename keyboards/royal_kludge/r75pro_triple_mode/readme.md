@@ -1,5 +1,5 @@
 # R75PRO
-* Keyboard Maintainer: [sdk66](https://github.com/sdk66)
+* Keyboard Maintainer: [Valkyrie Ashwood](https://github.com/valkyrieashwood)
 * Hardware Supported: R75PRO
 * Hardware Availability: [R75PRO](https://www.rkgaming.com)
 

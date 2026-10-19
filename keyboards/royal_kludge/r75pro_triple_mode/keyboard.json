@@ -1,7 +1,7 @@
 {
     "manufacturer": "RK",
     "keyboard_name": "R75Pro",
-    "maintainer": "sdk66",
+    "maintainer": "valkyrieashwood",
     "bootloader": "wb32-dfu",
     "debounce": 10,
     "diode_direction": "ROW2COL",
