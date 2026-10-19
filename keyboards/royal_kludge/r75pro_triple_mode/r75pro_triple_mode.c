@@ -203,17 +203,16 @@ bool rgb_matrix_blink_user(blink_rgb_t *blink_rgb) {
 
             if (blink_rgb->flip) {
                 if (charging_state && ((bat_full_flag))) {
-                    writePin(LED_CHARING_PIN, !LED_PIN_ON_STATE);
+                    gpio_write_pin(LED_CHARING_PIN, !LED_PIN_ON_STATE);
                 } else if ((charging_state) && (!bat_full_flag)) {
-                    writePin(LED_CHARING_PIN, blink_rgb->color.r ? LED_PIN_ON_STATE : !LED_PIN_ON_STATE);
+                    gpio_write_pin(LED_CHARING_PIN, blink_rgb->color.r ? LED_PIN_ON_STATE : !LED_PIN_ON_STATE);
                 } else if ((!charging_state) && (*md_getp_bat() <= BATTERY_CAPACITY_LOW)) {
                     rgb_matrix_set_color(HS_RGB_BLINK_INDEX_BAT, 0xff, 0x00, 0x00);
                 } else {
-                    writePin(LED_CHARING_PIN, !LED_PIN_ON_STATE);
-                    // rgb_matrix_set_color(HS_RGB_BLINK_INDEX_BAT, 0x00, 0x00, 0x00);
+                    gpio_write_pin(LED_CHARING_PIN, !LED_PIN_ON_STATE);
                 }
             } else {
-                writePin(LED_CHARING_PIN, !LED_PIN_ON_STATE);
+                gpio_write_pin(LED_CHARING_PIN, !LED_PIN_ON_STATE);
                 rgb_matrix_set_color(HS_RGB_BLINK_INDEX_BAT, 0x00, 0x00, 0x00);
             }
 
@@ -222,14 +221,14 @@ bool rgb_matrix_blink_user(blink_rgb_t *blink_rgb) {
         case RGB_MATRIX_BLINK_INDEX_IND: {
             if (blink_rgb->flip) {
                 if (USB_DRIVER.state != USB_SUSPENDED) {
-                    writePin(LED_CAPS_PIN, blink_rgb->color.r ? LED_PIN_ON_STATE : !LED_PIN_ON_STATE);
-                    writePin(LED_WIN_PIN, blink_rgb->color.g ? LED_PIN_ON_STATE : !LED_PIN_ON_STATE);
-                    if (ind_status != ind_state_none) writePin(LED_CHARING_PIN, blink_rgb->color.b ? LED_PIN_ON_STATE : !LED_PIN_ON_STATE);
+                    gpio_write_pin(LED_CAPS_PIN, blink_rgb->color.r ? LED_PIN_ON_STATE : !LED_PIN_ON_STATE);
+                    gpio_write_pin(LED_WIN_PIN, blink_rgb->color.g ? LED_PIN_ON_STATE : !LED_PIN_ON_STATE);
+                    if (ind_status != ind_state_none) gpio_write_pin(LED_CHARING_PIN, blink_rgb->color.b ? LED_PIN_ON_STATE : !LED_PIN_ON_STATE);
                 }
             } else {
-                writePin(LED_CAPS_PIN, !LED_PIN_ON_STATE);
-                writePin(LED_WIN_PIN, !LED_PIN_ON_STATE);
-                if (ind_status != ind_state_none) writePin(LED_CHARING_PIN, !LED_PIN_ON_STATE);
+                gpio_write_pin(LED_CAPS_PIN, !LED_PIN_ON_STATE);
+                gpio_write_pin(LED_WIN_PIN, !LED_PIN_ON_STATE);
+                if (ind_status != ind_state_none) gpio_write_pin(LED_CHARING_PIN, !LED_PIN_ON_STATE);
             }
             return false;
         } break;
@@ -326,11 +325,11 @@ void keyboard_post_init_kb(void) {
 #endif
 
 #ifdef MM_BT_DEF_PIN
-    setPinInputHigh(MM_BT_DEF_PIN);
+    gpio_set_pin_input_high(MM_BT_DEF_PIN);
 #endif
 
 #ifdef MM_2G4_DEF_PIN
-    setPinInputHigh(MM_2G4_DEF_PIN);
+    gpio_set_pin_input_high(MM_2G4_DEF_PIN);
 #endif
 
 #ifdef USB_POWER_EN_PIN
@@ -339,11 +338,11 @@ void keyboard_post_init_kb(void) {
 #endif
 
 #ifdef HS_BAT_CABLE_PIN
-    setPinInput(HS_BAT_CABLE_PIN);
+    gpio_set_pin_input(HS_BAT_CABLE_PIN);
 #endif
 
 #ifdef BAT_FULL_PIN
-    setPinInputHigh(BAT_FULL_PIN);
+    gpio_set_pin_input_high(BAT_FULL_PIN);
 #endif
 
 #ifdef LED_CAPS_PIN
@@ -823,7 +822,7 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
             if (record->event.pressed) {
                 light_low_level = false;
                 hs_vad_time     = timer_read32();
-                if (!readPin(LED_POWER_EN_PIN)) {
+                if (!gpio_read_pin(LED_POWER_EN_PIN)) {
                     gpio_write_pin_high(LED_POWER_EN_PIN);
                     return false;
                 } else {
@@ -1010,8 +1009,8 @@ void hs_send_bat_status(void) {
     uint8_t         hs_now_mode;
     static uint32_t hs_current_time;
 
-    charging_state = readPin(HS_BAT_CABLE_PIN);
-    bat_full_flag  = readPin(BAT_FULL_PIN);
+    charging_state = gpio_read_pin(HS_BAT_CABLE_PIN);
+    bat_full_flag  = gpio_read_pin(BAT_FULL_PIN);
 
     if (charging_state && (bat_full_flag)) {
         hs_now_mode = MD_SND_CMD_DEVCTRL_CHARGING_DONE;
@@ -1138,13 +1137,6 @@ void wireless_devs_change_kb(uint8_t old_devs, uint8_t new_devs, bool reset) {
                 rgb_matrix_wls_indicator_set(HS_RGB_BLINK_INDEX_2G4, (RGB){HS_LBACK_COLOR_2G4}, 500, 1);
             }
         } break;
-        // case DEVS_USB: {
-        //     if (reset) {
-        //         rgb_matrix_wls_indicator_set(HS_RGB_BLINK_INDEX_USB, (RGB){HS_LBACK_COLOR_2G4}, 200, 1);
-        //     } else {
-        //         rgb_matrix_wls_indicator_set(HS_RGB_BLINK_INDEX_USB, (RGB){HS_LBACK_COLOR_2G4}, 500, 1);
-        //     }
-        // } break;
         default:
             break;
     }
@@ -1305,7 +1297,7 @@ void hs_rgb_blink_hook_user(void) {
             } break;
             case MD_STATE_CONNECTED: {
                 if (linker_ok == false) {
-                    if ((rgb_matrix_get_val() <= 0) || (!readPin(LED_POWER_EN_PIN))) {
+                    if ((rgb_matrix_get_val() <= 0) || (!gpio_read_pin(LED_POWER_EN_PIN))) {
                         light_low_level = true;
                         hs_vad_time     = timer_read32();
                         gpio_write_pin_high(LED_POWER_EN_PIN);

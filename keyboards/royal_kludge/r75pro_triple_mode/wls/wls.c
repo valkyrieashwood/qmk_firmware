@@ -1,3 +1,6 @@
+// Copyright 2024 SDK (@sdk66)
+// SPDX-License-Identifier: GPL-2.0-or-later
+
 #include "wls.h"
 #include "usb_main.h"
 
@@ -187,19 +190,19 @@ bool hs_rgb_blink_hook() {
 
 void lpwr_exti_init_hook(void) {
 #ifdef HS_BT_DEF_PIN
-    setPinInputHigh(HS_BT_DEF_PIN);
+    gpio_set_pin_input_high(HS_BT_DEF_PIN);
     waitInputPinDelay();
     palEnableLineEvent(HS_BT_DEF_PIN, PAL_EVENT_MODE_BOTH_EDGES);
 #endif
 
 #ifdef HS_2G4_DEF_PIN
-    setPinInputHigh(HS_2G4_DEF_PIN);
+    gpio_set_pin_input_high(HS_2G4_DEF_PIN);
     waitInputPinDelay();
     palEnableLineEvent(HS_2G4_DEF_PIN, PAL_EVENT_MODE_BOTH_EDGES);
 #endif
 
 #ifdef BAT_FULL_PIN
-    setPinInputHigh(BAT_FULL_PIN);
+    gpio_set_pin_input_high(BAT_FULL_PIN);
     waitInputPinDelay();
     palEnableLineEvent(BAT_FULL_PIN, PAL_EVENT_MODE_FALLING_EDGE);
 #endif
@@ -208,14 +211,14 @@ void lpwr_exti_init_hook(void) {
 #if DIODE_DIRECTION == ROW2COL
         for (uint8_t i = 0; i < ARRAY_SIZE(col_pins); i++) {
             if (col_pins[i] != NO_PIN) {
-                setPinOutput(col_pins[i]);
-                writePinHigh(col_pins[i]);
+                gpio_set_pin_output(col_pins[i]);
+                gpio_write_pin_high(col_pins[i]);
             }
         }
 #endif
     }
 
-    setPinInput(HS_BAT_CABLE_PIN);
+    gpio_set_pin_input(HS_BAT_CABLE_PIN);
     waitInputPinDelay();
     palEnableLineEvent(HS_BAT_CABLE_PIN, PAL_EVENT_MODE_RISING_EDGE);
     palEnableLineEvent(A12, PAL_EVENT_MODE_RISING_EDGE);
@@ -291,6 +294,7 @@ void lpwr_stop_hook_post(void) {
     }
 }
 
+#ifdef VIA_ENABLE
 void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
     // data = [ command_id, channel_id, value_id, value_data ]
     uint8_t *command_id = &(data[0]);
@@ -359,13 +363,10 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
 bool via_command_kb(uint8_t *data, uint8_t length) {
     hs_rgb_blink_set_timer(timer_read32());
 
-    // if (hs_via_custom_value_command_kb(data, length) != false){
-    //     replaced_hid_send(data, length);
-    //     return true;
-    // }
     uint8_t *command_id = &(data[0]);
     if (*command_id == id_eeprom_reset) {
         hs_reset_settings();
     }
     return false;
 }
+#endif

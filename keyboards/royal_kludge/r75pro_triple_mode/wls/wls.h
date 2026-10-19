@@ -1,17 +1,16 @@
-#include "gpio.h"
-#define readPin(pin) gpio_read_pin(pin)
-#define setPinInputHigh(pin) gpio_set_pin_input_high(pin)
-#define setPinOutput(pin) gpio_set_pin_output(pin)
-#define writePinHigh(pin) gpio_write_pin_high(pin)
-#define writePin(pin, level) gpio_write_pin(pin, level)
-#define setPinInput(pin) gpio_set_pin_input(pin)
-#include QMK_KEYBOARD_H
+// Copyright 2024 SDK (@sdk66)
+// SPDX-License-Identifier: GPL-2.0-or-later
 
+#pragma once
+
+#include QMK_KEYBOARD_H
 #include "quantum.h"
 #include <stdbool.h>
 #include "wireless.h"
 #include "raw_hid.h"
-#include "via.h"
+#ifdef VIA_ENABLE
+#    include "via.h"
+#endif
 #include "rgb_record/rgb_record.h"
 
 #ifdef MM_BT_DEF_PIN
@@ -26,7 +25,7 @@
 #define HS_2G4_PIN_STATE 1, 0
 #define HS_USB_PIN_STATE 1, 1
 
-#define HS_GET_MODE_PIN_(pin_bt, pin_2g4) ((((#pin_bt)[0] == 'x') || ((readPin(HS_BT_DEF_PIN) + 0x30) == ((#pin_bt)[0]))) && (((#pin_2g4)[0] == 'x') || ((readPin(HS_2G4_DEF_PIN) + 0x30) == ((#pin_2g4)[0]))))
+#define HS_GET_MODE_PIN_(pin_bt, pin_2g4) ((((#pin_bt)[0] == 'x') || ((gpio_read_pin(HS_BT_DEF_PIN) + 0x30) == ((#pin_bt)[0]))) && (((#pin_2g4)[0] == 'x') || ((gpio_read_pin(HS_2G4_DEF_PIN) + 0x30) == ((#pin_2g4)[0]))))
 #define HS_GET_MODE_PIN(state) HS_GET_MODE_PIN_(state)
 #define HS_MODEIO_DETECTION_TIME 50
 #define HS_LBACK_TIMEOUT (30 * 1000)

@@ -1,3 +1,8 @@
+// Copyright 2024 SDK (@sdk66)
+// SPDX-License-Identifier: GPL-2.0-or-later
+
+#pragma once
+
 #include "rgblight.h"
 
 #define RGBLIGHT_RAINBOW_SWIRL_RANGE 255

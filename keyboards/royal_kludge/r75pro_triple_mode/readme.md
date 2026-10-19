@@ -5,11 +5,11 @@
 
 Make example for this keyboard (after setting up your build environment):
 
-    qmk compile -j 0 -kb royal_kludge/r75pro_triple_mode -km default
-        
+    make royal_kludge/r75pro_triple_mode:default
+
 Flashing example for this keyboard:
 
-    qmk flash -j 0 -kb royal_kludge/r75pro_triple_mode -km default
+    make royal_kludge/r75pro_triple_mode:default:flash
 
 To reset the board into bootloader mode, do one of the following:
 
